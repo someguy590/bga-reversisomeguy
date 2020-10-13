@@ -45,6 +45,30 @@
 /* Note: you must not use any @import directive */
 
 /********* You can start writing your CSS below this line: **********/
+#board {
+    width: 536px;
+    height: 528px;
+    background-image: url('img/board.jpg');
+    position: relative;
+}
+
+.square {
+    width: 62px;
+    height: 62px;
+    position: absolute;
+}
+
+.token {
+    width: 56px;
+    height: 56px;
+    position: absolute;
+    background-image: url('img/tokens.png');
+}
+
+.tokencolor_ffffff { background-position: 0px 0px;}
+.tokencolor_000000 { background-position: -56px 0px;}
+
+
 
 /*
     Example of CSS sprites (a black token and a white token, 20x20px each, embedded in the same "tokens.png" 40x20px image):

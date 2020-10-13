@@ -40,7 +40,20 @@ class view_reversisomeguy_reversisomeguy extends game_view
     $players_nbr = count($players);
 
     /*********** Place your code below:  ************/
+    $this->page->begin_block("reversisomeguy_reversisomeguy", "square");
 
+    $hor_scale = 64.8;
+    $ver_scale = 64.4;
+    for ($x = 0; $x < 8; $x++) {
+      for ($y = 0; $y < 8; $y++) {
+        $this->page->insert_block("square", array(
+          'X' => $x,
+          'Y' => $y,
+          'LEFT' => round($x * $hor_scale + 10),
+          'TOP' => round($y * $ver_scale + 7)
+        ));
+      }
+    }
 
     /*
         

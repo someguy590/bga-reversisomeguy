@@ -25,13 +25,20 @@
     Please REMOVE this comment before publishing your game on BGA
 -->
 
+<div id="board">
+    <!-- BEGIN square -->
+    <div id="square_{X}_{Y}" class="square" style="left: {LEFT}px; top: {TOP}px;"></div>
+    <!-- END square -->
 
-This is your game interface. You can edit this HTML in your ".tpl" file.
+    <div id="tokens">
 
+    </div>
+</div>
 
 <script type="text/javascript">
 
 // Javascript HTML templates
+var jstpl_token = '<div class="token tokencolor_${color}" id="token_${x}_${y}"></div>'
 
     /*
     // Example:
