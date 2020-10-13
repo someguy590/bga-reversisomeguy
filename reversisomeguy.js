@@ -46,15 +46,12 @@ define([
 
             setup: function (gamedatas) {
                 console.log("Starting game setup");
-
-                // Setting up player boards
-                for (var player_id in gamedatas.players) {
-                    var player = gamedatas.players[player_id];
-
-                    // TODO: Setting up players boards if needed
-                }
-
                 // TODO: Set up your game interface here, according to "gamedatas"
+                // set board
+                for (let {x, y, player} of Object.values(gamedatas.board)) {
+                    if (player !== null)
+                        this.addTokenOnBoard(x, y, player);
+                }
 
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
@@ -148,6 +145,17 @@ define([
                 script.
             
             */
+
+            addTokenOnBoard: function (x, y, player) {
+                dojo.place(this.format_block('jstpl_token', {
+                    x: x,
+                    y: y,
+                    color: this.gamedatas.players[player].color
+                }), 'tokens');
+
+                this.placeOnObject(`token_${x}_${y}`, `overall_player_board_${player}`)
+                this.slideToObject(`token_${x}_${y}`, `square_${x}_${y}`).play()
+            },
 
 
             ///////////////////////////////////////////////////

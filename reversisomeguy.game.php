@@ -87,7 +87,23 @@ class ReversiSomeguy extends Table
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
         // TODO: setup the initial game situation here
+        // init board
+        $sql = "INSERT INTO board (board_x, board_y, board_player) VALUES ";
+        $sql_values = array();
+        list($black_player_id, $white_player_id) = array_keys($players);
 
+        for ($x = 0; $x < 8; $x++) {
+            for ($y = 0; $y < 8; $y++) {
+                $token_value = "NULL";
+                if (($x == 3 && $y == 3) || ($x == 4 && $y == 4))
+                    $token_value = "'$white_player_id'";
+                else if (($x == 3 && $y == 4) || ($x == 4 && $y == 3))
+                    $token_value = "'$black_player_id'";
+                $sql_values[] = "('$x', '$y', $token_value)";
+            }
+        }
+        $sql .= implode(',', $sql_values);
+        self::DBQuery($sql);
 
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
@@ -110,12 +126,12 @@ class ReversiSomeguy extends Table
 
         $current_player_id = self::getCurrentPlayerId();    // !! We must only return informations visible by this player !!
 
-        // Get information about players
-        // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
-        $sql = "SELECT player_id id, player_score score FROM player ";
-        $result['players'] = self::getCollectionFromDb($sql);
+        // get board
+        $sql = "SELECT board_x x, board_y y, board_player player
+        FROM board 
+        WHERE board_player IS NOT NULL";
 
-        // TODO: Gather all information about current game situation (visible by player $current_player_id).
+        $result['board'] = self::getObjectListFromDB($sql);
 
         return $result;
     }
