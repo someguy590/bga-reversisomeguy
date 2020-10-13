@@ -30,11 +30,15 @@
     <div id="square_{X}_{Y}" class="square" style="left: {LEFT}px; top: {TOP}px;"></div>
     <!-- END square -->
 
+    <div id="tokens">
+
+    </div>
 </div>
 
 <script type="text/javascript">
 
 // Javascript HTML templates
+var jstpl_token = '<div class="token tokencolor_${color}" id="token_${x}_${y}"></div>'
 
     /*
     // Example:
