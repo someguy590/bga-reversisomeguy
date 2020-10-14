@@ -48,10 +48,13 @@ define([
                 console.log("Starting game setup");
                 // TODO: Set up your game interface here, according to "gamedatas"
                 // set board
-                for (let {x, y, player} of Object.values(gamedatas.board)) {
+                for (let { x, y, player } of Object.values(gamedatas.board)) {
                     if (player !== null)
                         this.addTokenOnBoard(x, y, player);
                 }
+
+                // make squares discable
+                dojo.query('.square').connect('onclick', this, 'onPlayDisc');
 
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
@@ -71,6 +74,10 @@ define([
                 console.log('Entering state: ' + stateName);
 
                 switch (stateName) {
+
+                    case 'playerTurn':
+                        this.updatePossibleMoves(args.args.possibleMoves);
+                        break;
 
                     /* Example:
                     
@@ -157,6 +164,17 @@ define([
                 this.slideToObject(`token_${x}_${y}`, `square_${x}_${y}`).play()
             },
 
+            updatePossibleMoves: function (possibleMoves) {
+                // remove current possible moves
+                dojo.query('.possibleMove').removeClass('possibleMove');
+
+                for (let [x, y] of possibleMoves) {
+                    // x, y is a possible move
+                    dojo.addClass(`square_${x}_${y}`, 'possibleMove');
+                }
+                this.addTooltipToClass('possibleMove', '', _('Place a disc here'));
+            },
+
 
             ///////////////////////////////////////////////////
             //// Player's action
@@ -171,6 +189,25 @@ define([
                 _ make a call to the game server
             
             */
+
+            onPlayDisc: function (e) {
+                dojo.stopEvent(e);
+
+                // square id = square_x_y
+                let coords = e.currentTarget.id.split('_');
+                let x = coords[1];
+                let y = coords[2];
+
+                if (!dojo.hasClass(`square_${x}_${y}`, 'possibleMove'))
+                    return;
+
+                if (this.checkAction('playDisc')) {
+                    this.ajaxcall("/reversisomeguy/reversisomeguy/playDisc.html", {
+                        x: x,
+                        y: y,
+                    }, this, function (result) { });
+                }
+            },
 
             /* Example:
             
