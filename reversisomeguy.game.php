@@ -159,9 +159,70 @@ class ReversiSomeguy extends Table
     ////////////    
 
     /*
-        In this space, you can put any utility methods useful for your game logic
+    In this space, you can put any utility methods useful for your game logic
     */
+    function getTurnedOverDiscs($x, $y, $player, $board)
+    {
+        // check if square has a disc
+        $player_disc = $board[$x][$y];
+        if (!is_null($player_disc))
+            return [];
 
+        $turned_discs = [];
+        for ($i = -1; $i <= 1; $i++) {
+            for ($j = -1; $j <= 1; $j++) {
+                if ($i === 0 && $j === 0)
+                    continue;
+
+                $isLineOfDiscs = false;
+                $line_of_discs = [];
+                $x_direction = $i;
+                $y_direction = $j;
+                $nextX = $x + $i;
+                $nextY = $y + $j;
+                while ($nextX >= 0 && $nextX < 8 && $nextY >= 0 && $nextY < 8) {
+                    $next_disc = $board[$nextX][$nextY];
+                    // looking for the opponents disc to start a line
+                    // then own disc to reverse disc inbetween
+                    if (is_null($next_disc))
+                        break;
+                    else if ($next_disc === $player && !$isLineOfDiscs)
+                        break;
+                    else if ($next_disc === $player && $isLineOfDiscs) {
+                        $turned_discs = array_merge($turned_discs, $line_of_discs);
+                        break;
+                    } else {
+                        $isLineOfDiscs = true;
+                        $line_of_discs[] = [$nextX, $nextY];
+                    }
+
+                    $nextX += $x_direction;
+                    $nextY += $y_direction;
+                }
+            }
+        }
+
+        return $turned_discs;
+    }
+
+
+    function getPossibleMoves($player)
+    {
+        $sql = "SELECT board_x x, board_y y, board_player player
+        FROM board";
+        $board = self::getDoubleKeyCollectionFromDB($sql, true);
+
+        $moves = [];
+        for ($x = 0; $x < 8; $x++) {
+            for ($y = 0; $y < 8; $y++) {
+                $turned_discs = $this->getTurnedOverDiscs($x, $y, $player, $board);
+                if ($turned_discs)
+                    $moves[] = [$x, $y];
+            }
+        }
+
+        return $moves;
+    }
 
 
     //////////////////////////////////////////////////////////////////////////////
@@ -209,6 +270,13 @@ class ReversiSomeguy extends Table
         These methods function is to return some additional information that is specific to the current
         game state.
     */
+
+    function argPlayerTurn()
+    {
+        return array(
+            'possibleMoves' => $this->getPossibleMoves(self::getActivePlayerId())
+        );
+    }
 
     /*
     
