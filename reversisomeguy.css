@@ -68,6 +68,13 @@
 .tokencolor_ffffff { background-position: 0px 0px;}
 .tokencolor_000000 { background-position: -56px 0px;}
 
+.possibleMove {
+    background: white;
+    opacity: 0.2;
+    filter: alpha(opacity=20); /* For IE8 and earlier */
+    cursor: pointer;
+}
+
 
 
 /*
