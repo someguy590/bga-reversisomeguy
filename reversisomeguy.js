@@ -46,7 +46,6 @@ define([
 
             setup: function (gamedatas) {
                 console.log("Starting game setup");
-                // TODO: Set up your game interface here, according to "gamedatas"
                 // set board
                 for (let { x, y, player } of Object.values(gamedatas.board)) {
                     if (player !== null)
@@ -160,8 +159,8 @@ define([
                     color: this.gamedatas.players[player].color
                 }), 'tokens');
 
-                this.placeOnObject(`token_${x}_${y}`, `overall_player_board_${player}`)
-                this.slideToObject(`token_${x}_${y}`, `square_${x}_${y}`).play()
+                this.placeOnObject(`token_${x}_${y}`, `overall_player_board_${player}`);
+                this.slideToObject(`token_${x}_${y}`, `square_${x}_${y}`).play();
             },
 
             updatePossibleMoves: function (possibleMoves) {
@@ -209,41 +208,6 @@ define([
                     }, this, function (result) { });
                 }
             },
-
-            /* Example:
-            
-            onMyMethodToCall1: function( evt )
-            {
-                console.log( 'onMyMethodToCall1' );
-                
-                // Preventing default browser reaction
-                dojo.stopEvent( evt );
-    
-                // Check that this action is possible (see "possibleactions" in states.inc.php)
-                if( ! this.checkAction( 'myAction' ) )
-                {   return; }
-    
-                this.ajaxcall( "/reversisomeguy/reversisomeguy/myAction.html", { 
-                                                                        lock: true, 
-                                                                        myArgument1: arg1, 
-                                                                        myArgument2: arg2,
-                                                                        ...
-                                                                     }, 
-                             this, function( result ) {
-                                
-                                // What to do after the server call if it succeeded
-                                // (most of the time: nothing)
-                                
-                             }, function( is_error) {
-    
-                                // What to do after the server call in anyway (success or failure)
-                                // (most of the time: nothing)
-    
-                             } );        
-            },        
-            
-            */
-
 
             ///////////////////////////////////////////////////
             //// Reaction to cometD notifications
