@@ -191,6 +191,7 @@ define([
             */
 
             onPlayDisc: function (e) {
+                e.preventDefault();
                 dojo.stopEvent(e);
 
                 // square id = square_x_y
