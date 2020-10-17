@@ -385,6 +385,14 @@ class ReversiSomeguy extends Table
         The action method of state X is called everytime the current game state is set to X.
     */
 
+    function stNextPlayer()
+    {
+        $player_id = self::activeNextPlayer();
+
+        self::giveExtraTime($player_id);
+        $this->gamestate->nextState("nextTurn");
+    }
+
     /*
     
     Example for game state "MyGameState":
