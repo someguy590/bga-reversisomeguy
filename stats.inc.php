@@ -56,20 +56,7 @@ $stats_type = array(
             "id" => 10,
             "name" => totranslate("Number of turns"),
             "type" => "int"
-        ),
-
-        /*
-        Examples:
-
-
-        "table_teststat1" => array(   "id"=> 10,
-                                "name" => totranslate("table test stat 1"), 
-                                "type" => "int" ),
-                                
-        "table_teststat2" => array(   "id"=> 11,
-                                "name" => totranslate("table test stat 2"), 
-                                "type" => "float" )
-*/
+        )
     ),
 
     // Statistics existing for each player
