@@ -122,9 +122,11 @@ class ReversiSomeguy extends Table
     */
     protected function getAllDatas()
     {
-        $result = array();
+        $result = array('players' => array());
 
-        $current_player_id = self::getCurrentPlayerId();    // !! We must only return informations visible by this player !!
+        // Add players specific infos
+        $sql = "SELECT player_id id, player_score score FROM player ";
+        $result['players'] = self::getCollectionFromDb($sql);
 
         // get board
         $sql = "SELECT board_x x, board_y y, board_player player
