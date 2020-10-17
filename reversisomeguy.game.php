@@ -91,7 +91,6 @@ class ReversiSomeguy extends Table
         self::initStat("player", 'centerDiscs', 0);
         self::initStat("player", 'turnedOver', 0);
 
-        // TODO: setup the initial game situation here
         // init board
         $sql = "INSERT INTO board (board_x, board_y, board_player) VALUES ";
         $sql_values = array();
@@ -108,7 +107,7 @@ class ReversiSomeguy extends Table
             }
         }
         $sql .= implode(',', $sql_values);
-        self::DBQuery($sql);
+        self::DbQuery($sql);
 
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
