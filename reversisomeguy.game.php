@@ -168,6 +168,12 @@ class ReversiSomeguy extends Table
     /*
     In this space, you can put any utility methods useful for your game logic
     */
+    static function getBoard()
+    {
+        $sql = "SELECT board_x x, board_y y, board_player player FROM board";
+        return self::getDoubleKeyCollectionFromDB($sql, true);
+    }
+
     function getTurnedOverDiscs($x, $y, $player, $board)
     {
         // check if square has a disc
@@ -215,9 +221,7 @@ class ReversiSomeguy extends Table
 
     function getPossibleMoves($player)
     {
-        $sql = "SELECT board_x x, board_y y, board_player player
-        FROM board";
-        $board = self::getDoubleKeyCollectionFromDB($sql, true);
+        $board = self::getBoard();
 
         $moves = [];
         for ($x = 0; $x < 8; $x++) {
