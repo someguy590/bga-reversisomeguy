@@ -244,6 +244,77 @@ class ReversiSomeguy extends Table
         (note: each method below must match an input method in reversisomeguy.action.php)
     */
 
+    function playDisc($x, $y)
+    {
+        // check if action allowed in current state
+        self::checkAction('playDisc');
+
+        $board = self::getBoard();
+        $player_id = self::getActivePlayerId();
+        $turned_over_discs = $this->getTurnedOverDiscs($x, $y, $player_id, $board);
+
+        $sql = "UPDATE board
+        SET board_player='$player_id'
+        WHERE (board_x, board_y) IN ( ";
+        foreach ($turned_over_discs as $disc) {
+            [$turned_x, $turned_y] = $disc;
+            $sql .= "($turned_x, $turned_y),";
+        }
+        $sql .= "($x, $y))";
+        self::DbQuery($sql);
+
+        $sql = "UPDATE player
+        SET player_score = (
+        SELECT COUNT(board_x) FROM board WHERE board_player='$player_id'
+        )
+        WHERE player_id='$player_id'";
+        self::DbQuery($sql);
+
+        $sql = "UPDATE player
+        SET player_score = (
+        SELECT COUNT(board_x) FROM board
+        WHERE NOT board_player='$player_id' AND board_player IS NOT NULL
+        )
+        WHERE NOT player_id='$player_id'";
+        self::DbQuery($sql);
+
+        // statistics
+        self::incStat(count($turned_over_discs), "turnedOver", $player_id);
+
+        if (($x == 0 && $y == 0) || ($x == 7 && $y == 0) || ($x == 7 && $y == 7) || ($x == 0 && $y == 7))
+            self::incStat(1, "cornerDiscs", $player_id);
+        else if ($x == 0 || $x == 7 || $y == 0 || $y == 7)
+            self::incStat(1, "borderDiscs", $player_id);
+        else if ($x >= 2 && $x <= 5 && $y >= 2 && $y <= 5)
+            self::incStat(1, "centerDiscs", $player_id);
+
+        // notify
+        self::notifyAllPlayers(
+            "playDisc",
+            clienttranslate('${player_name} plays a disc and turns over ${returned_nbr} disc(s)'),
+            array(
+                "player_id" => $player_id,
+                "player_name" => self::getActivePlayerName(),
+                "returned_nbr" => count($turned_over_discs),
+                "x" => $x,
+                "y" => $y
+            )
+        );
+
+        self::notifyAllPlayers("turnOverDiscs", "", array(
+            "player_id" => $player_id,
+            "turnedOver" => $turned_over_discs
+        ));
+
+        $new_scores = self::getObjectListFromDB("SELECT player_id, player_score FROM player");
+        self::notifyAllPlayers("newScores", "", array(
+            "scores" => $new_scores
+        ));
+
+        // next state
+        $this->gamestate->nextState('playDisc');
+    }
+
     /*
     
     Example:

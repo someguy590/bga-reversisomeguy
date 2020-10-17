@@ -224,34 +224,50 @@ define([
             setupNotifications: function () {
                 console.log('notifications subscriptions setup');
 
-                // TODO: here, associate your game notifications with local methods
+                dojo.subscribe("playDisc", this, "notif_playDisc");
+                this.notifqueue.setSynchronous("playDisc", 500);
 
-                // Example 1: standard notification handling
-                // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
+                dojo.subscribe("turnOverDiscs", this, "notif_turnOverDiscs");
+                this.notifqueue.setSynchronous("turnOverDiscs", 1500);
 
-                // Example 2: standard notification handling + tell the user interface to wait
-                //            during 3 seconds after calling the method in order to let the players
-                //            see what is happening in the game.
-                // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-                // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-                // 
+                dojo.subscribe("newScores", this, "notif_newScores");
+                this.notifqueue.setSynchronous("newScores", 500);
             },
 
-            // TODO: from this point and below, you can write your game notifications handling methods
+            notif_playDisc: function (notif) {
+                dojo.query('.possibleMove').removeClass('possibleMove');
+                this.addTokenOnBoard(notif.args.x, notif.args.y, notif.args.player_id);
+            },
 
-            /*
-            Example:
-            
-            notif_cardPlayed: function( notif )
-            {
-                console.log( 'notif_cardPlayed' );
-                console.log( notif );
-                
-                // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
-                
-                // TODO: play the card in the user interface.
-            },    
-            
-            */
+            notif_turnOverDiscs: function (notif) {
+                // get color of disc turner
+                const color = this.gamedatas.players[notif.args.player_id].color;
+
+                // make discs blink and set to a specific color
+                for (const token of notif.args.turnedOver) {
+                    const [x, y] = token;
+                    // make token blink 2 times
+                    const anim = dojo.fx.chain([
+                        dojo.fadeOut({ node: `token_${x}_${y}` }),
+                        dojo.fadeIn({ node: `token_${x}_${y}` }),
+                        dojo.fadeOut({
+                            node: `token_${x}_${y}`,
+                            onEnd: function (node) {
+                                // remove color
+                                dojo.removeClass(node, ['tokencolor_000000', 'tokencolor_ffffff']);
+                                dojo.addClass(node, `tokencolor_${color}`);
+                            }
+                        }),
+                        dojo.fadeIn({ node: `token_${x}_${y}` })
+                    ]);
+
+                    anim.play();
+                }
+            },
+
+            notif_newScores: function (notif) {
+                for (const { player_id, player_score } of notif.args.scores)
+                    this.scoreCtrl[player_id].toValue(player_score);
+            }
         });
     });
