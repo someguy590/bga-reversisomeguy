@@ -68,19 +68,29 @@ $stats_type = array(
             "type" => "int"
         ),
 
-        /*
-        Examples:    
-        
-        
-        "player_teststat1" => array(   "id"=> 10,
-                                "name" => totranslate("player test stat 1"), 
-                                "type" => "int" ),
-                                
-        "player_teststat2" => array(   "id"=> 11,
-                                "name" => totranslate("player test stat 2"), 
-                                "type" => "float" )
+        "cornerDiscs" => array(
+            "id" => 11,
+            "name" => totranslate("Discs played on a corner"),
+            "type" => "int"
+        ),
 
-*/
+        "borderDiscs" => array(
+            "id" => 12,
+            "name" => totranslate("Discs played on a border"),
+            "type" => "int"
+        ),
+
+        "centerDiscs" => array(
+            "id" => 13,
+            "name" => totranslate("Discs played on board center part"),
+            "type" => "int"
+        ),
+
+        "turnedOver" => array(
+            "id" => 14,
+            "name" => totranslate("Number discs turned over"),
+            "type" => "int"
+        )
     )
 
 );
