@@ -265,17 +265,8 @@ class ReversiSomeguy extends Table
 
         $sql = "UPDATE player
         SET player_score = (
-        SELECT COUNT(board_x) FROM board WHERE board_player='$player_id'
-        )
-        WHERE player_id='$player_id'";
-        self::DbQuery($sql);
-
-        $sql = "UPDATE player
-        SET player_score = (
-        SELECT COUNT(board_x) FROM board
-        WHERE NOT board_player='$player_id' AND board_player IS NOT NULL
-        )
-        WHERE NOT player_id='$player_id'";
+        SELECT COUNT(board_x) FROM board WHERE board_player=player_id
+        )";
         self::DbQuery($sql);
 
         // statistics
