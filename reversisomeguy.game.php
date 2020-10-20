@@ -355,7 +355,7 @@ class ReversiSomeguy extends Table
     function argPlayerTurn()
     {
         return array(
-            'possibleMoves' => $this->getPossibleMoves(self::getActivePlayerId())
+            'possibleMoves' => $this->getPossibleMoves(strval(self::getActivePlayerId()))
         );
     }
 
