@@ -306,33 +306,6 @@ class ReversiSomeguy extends Table
         $this->gamestate->nextState('playDisc');
     }
 
-    /*
-    
-    Example:
-
-    function playCard( $card_id )
-    {
-        // Check that this is the player's turn and that it is a "possible action" at this game state (see states.inc.php)
-        self::checkAction( 'playCard' ); 
-        
-        $player_id = self::getActivePlayerId();
-        
-        // Add your game logic to play a card there 
-        ...
-        
-        // Notify all players about the card played
-        self::notifyAllPlayers( "cardPlayed", clienttranslate( '${player_name} plays ${card_name}' ), array(
-            'player_id' => $player_id,
-            'player_name' => self::getActivePlayerName(),
-            'card_name' => $card_name,
-            'card_id' => $card_id
-        ) );
-          
-    }
-    
-    */
-
-
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game state arguments
     ////////////
@@ -350,23 +323,6 @@ class ReversiSomeguy extends Table
         );
     }
 
-    /*
-    
-    Example for game state "MyGameState":
-    
-    function argMyGameState()
-    {
-        // Get some values from the current game situation in database...
-    
-        // return values:
-        return array(
-            'variable1' => $value1,
-            'variable2' => $value2,
-            ...
-        );
-    }    
-    */
-
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game state actions
     ////////////
@@ -383,19 +339,6 @@ class ReversiSomeguy extends Table
         self::giveExtraTime($player_id);
         $this->gamestate->nextState("nextTurn");
     }
-
-    /*
-    
-    Example for game state "MyGameState":
-
-    function stMyGameState()
-    {
-        // Do some stuff ...
-        
-        // (very often) go to another gamestate
-        $this->gamestate->nextState( 'some_gamestate_transition' );
-    }    
-    */
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Zombie
@@ -436,48 +379,5 @@ class ReversiSomeguy extends Table
         }
 
         throw new feException("Zombie mode not supported at this game state: " . $statename);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////:
-    ////////// DB upgrade
-    //////////
-
-    /*
-        upgradeTableDb:
-        
-        You don't have to care about this until your game has been published on BGA.
-        Once your game is on BGA, this method is called everytime the system detects a game running with your old
-        Database scheme.
-        In this case, if you change your Database scheme, you just have to apply the needed changes in order to
-        update the game database and allow the game to continue to run with your new version.
-    
-    */
-
-    function upgradeTableDb($from_version)
-    {
-        // $from_version is the current version of this game database, in numerical form.
-        // For example, if the game was running with a release of your game named "140430-1345",
-        // $from_version is equal to 1404301345
-
-        // Example:
-        //        if( $from_version <= 1404301345 )
-        //        {
-        //            // ! important ! Use DBPREFIX_<table_name> for all tables
-        //
-        //            $sql = "ALTER TABLE DBPREFIX_xxxxxxx ....";
-        //            self::applyDbUpgradeToAllDB( $sql );
-        //        }
-        //        if( $from_version <= 1405061421 )
-        //        {
-        //            // ! important ! Use DBPREFIX_<table_name> for all tables
-        //
-        //            $sql = "CREATE TABLE DBPREFIX_xxxxxxx ....";
-        //            self::applyDbUpgradeToAllDB( $sql );
-        //        }
-        //        // Please add your future database scheme changes here
-        //
-        //
-
-
     }
 }
