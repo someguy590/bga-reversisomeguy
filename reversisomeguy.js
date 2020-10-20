@@ -59,6 +59,8 @@ define([
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
 
+                this.ensureSpecificImageLoading(['../common/point.png']);
+
                 console.log("Ending game setup");
             },
 
