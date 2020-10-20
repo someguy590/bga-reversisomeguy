@@ -46,16 +46,20 @@ define([
 
             setup: function (gamedatas) {
                 console.log("Starting game setup");
-                // TODO: Set up your game interface here, according to "gamedatas"
                 // set board
-                for (let {x, y, player} of Object.values(gamedatas.board)) {
+                for (let { x, y, player } of Object.values(gamedatas.board)) {
                     if (player !== null)
                         this.addTokenOnBoard(x, y, player);
                 }
 
+                // make squares discable
+                dojo.query('.square').connect('onclick', this, 'onPlayDisc');
+
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
+
+                this.ensureSpecificImageLoading(['../common/point.png']);
 
                 console.log("Ending game setup");
             },
@@ -71,6 +75,10 @@ define([
                 console.log('Entering state: ' + stateName);
 
                 switch (stateName) {
+
+                    case 'playerTurn':
+                        this.updatePossibleMoves(args.args.possibleMoves);
+                        break;
 
                     /* Example:
                     
@@ -153,8 +161,19 @@ define([
                     color: this.gamedatas.players[player].color
                 }), 'tokens');
 
-                this.placeOnObject(`token_${x}_${y}`, `overall_player_board_${player}`)
-                this.slideToObject(`token_${x}_${y}`, `square_${x}_${y}`).play()
+                this.placeOnObject(`token_${x}_${y}`, `overall_player_board_${player}`);
+                this.slideToObject(`token_${x}_${y}`, `square_${x}_${y}`).play();
+            },
+
+            updatePossibleMoves: function (possibleMoves) {
+                // remove current possible moves
+                dojo.query('.possibleMove').removeClass('possibleMove');
+
+                for (let [x, y] of possibleMoves) {
+                    // x, y is a possible move
+                    dojo.addClass(`square_${x}_${y}`, 'possibleMove');
+                }
+                this.addTooltipToClass('possibleMove', '', _('Place a disc here'));
             },
 
 
@@ -172,40 +191,26 @@ define([
             
             */
 
-            /* Example:
-            
-            onMyMethodToCall1: function( evt )
-            {
-                console.log( 'onMyMethodToCall1' );
-                
-                // Preventing default browser reaction
-                dojo.stopEvent( evt );
-    
-                // Check that this action is possible (see "possibleactions" in states.inc.php)
-                if( ! this.checkAction( 'myAction' ) )
-                {   return; }
-    
-                this.ajaxcall( "/reversisomeguy/reversisomeguy/myAction.html", { 
-                                                                        lock: true, 
-                                                                        myArgument1: arg1, 
-                                                                        myArgument2: arg2,
-                                                                        ...
-                                                                     }, 
-                             this, function( result ) {
-                                
-                                // What to do after the server call if it succeeded
-                                // (most of the time: nothing)
-                                
-                             }, function( is_error) {
-    
-                                // What to do after the server call in anyway (success or failure)
-                                // (most of the time: nothing)
-    
-                             } );        
-            },        
-            
-            */
+            onPlayDisc: function (e) {
+                e.preventDefault();
+                dojo.stopEvent(e);
 
+                // square id = square_x_y
+                let coords = e.currentTarget.id.split('_');
+                let x = coords[1];
+                let y = coords[2];
+
+                if (!dojo.hasClass(`square_${x}_${y}`, 'possibleMove'))
+                    return;
+
+                if (this.checkAction('playDisc')) {
+                    this.ajaxcall("/reversisomeguy/reversisomeguy/playDisc.html", {
+                        x: x,
+                        y: y,
+                        lock: true,
+                    }, this, function (result) { });
+                }
+            },
 
             ///////////////////////////////////////////////////
             //// Reaction to cometD notifications
@@ -222,34 +227,50 @@ define([
             setupNotifications: function () {
                 console.log('notifications subscriptions setup');
 
-                // TODO: here, associate your game notifications with local methods
+                dojo.subscribe("playDisc", this, "notif_playDisc");
+                this.notifqueue.setSynchronous("playDisc", 500);
 
-                // Example 1: standard notification handling
-                // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
+                dojo.subscribe("turnOverDiscs", this, "notif_turnOverDiscs");
+                this.notifqueue.setSynchronous("turnOverDiscs", 1500);
 
-                // Example 2: standard notification handling + tell the user interface to wait
-                //            during 3 seconds after calling the method in order to let the players
-                //            see what is happening in the game.
-                // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-                // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-                // 
+                dojo.subscribe("newScores", this, "notif_newScores");
+                this.notifqueue.setSynchronous("newScores", 500);
             },
 
-            // TODO: from this point and below, you can write your game notifications handling methods
+            notif_playDisc: function (notif) {
+                dojo.query('.possibleMove').removeClass('possibleMove');
+                this.addTokenOnBoard(notif.args.x, notif.args.y, notif.args.player_id);
+            },
 
-            /*
-            Example:
-            
-            notif_cardPlayed: function( notif )
-            {
-                console.log( 'notif_cardPlayed' );
-                console.log( notif );
-                
-                // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
-                
-                // TODO: play the card in the user interface.
-            },    
-            
-            */
+            notif_turnOverDiscs: function (notif) {
+                // get color of disc turner
+                const color = this.gamedatas.players[notif.args.player_id].color;
+
+                // make discs blink and set to a specific color
+                for (const token of notif.args.turnedOver) {
+                    const [x, y] = token;
+                    // make token blink 2 times
+                    const anim = dojo.fx.chain([
+                        dojo.fadeOut({ node: `token_${x}_${y}` }),
+                        dojo.fadeIn({ node: `token_${x}_${y}` }),
+                        dojo.fadeOut({
+                            node: `token_${x}_${y}`,
+                            onEnd: function (node) {
+                                // remove color
+                                dojo.removeClass(node, ['tokencolor_000000', 'tokencolor_ffffff']);
+                                dojo.addClass(node, `tokencolor_${color}`);
+                            }
+                        }),
+                        dojo.fadeIn({ node: `token_${x}_${y}` })
+                    ]);
+
+                    anim.play();
+                }
+            },
+
+            notif_newScores: function (notif) {
+                for (const { player_id, player_score } of notif.args.scores)
+                    this.scoreCtrl[player_id].toValue(player_score);
+            }
         });
     });
