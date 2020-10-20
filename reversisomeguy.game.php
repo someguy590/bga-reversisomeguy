@@ -226,7 +226,7 @@ class ReversiSomeguy extends Table
         for ($x = 0; $x < 8; $x++) {
             for ($y = 0; $y < 8; $y++) {
                 $turned_discs = $this->getTurnedOverDiscs($x, $y, $player, $board);
-                if ($turned_discs)
+                if (count($turned_discs) > 0)
                     $moves[] = [$x, $y];
             }
         }
