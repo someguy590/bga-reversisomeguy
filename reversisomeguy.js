@@ -205,6 +205,7 @@ define([
                     this.ajaxcall("/reversisomeguy/reversisomeguy/playDisc.html", {
                         x: x,
                         y: y,
+                        lock: true,
                     }, this, function (result) { });
                 }
             },
